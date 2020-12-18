@@ -15,7 +15,11 @@ def login(request, redis_instance = _redis_instance):
     if redis_instance.get('login'):
         return HttpResponse("Ви вже увійшли до системи.")
     data = loads(request.body)
-
+    ks = data.keys()
+    if 'login' not in ks:
+        return HttpResponse("Вкажіть, будь-ласка логін.")
+    if 'password' not in ks:
+        return HttpResponse("Вкажіть, будь-ласка пароль.")
     filtered = User.objects.filter(login=data['login']).filter(password=data['password'])
     if len(filtered) != 1:
         return HttpResponse("Вводні данні не є вірними. Спробуйте ще раз.")
@@ -28,7 +32,5 @@ def login(request, redis_instance = _redis_instance):
 def logout(request, redis_instance = _redis_instance):
     if redis_instance.get('login'):
         redis_instance.delete('login')
-        redis_instance.delete('cart')
         return HttpResponse("Ви успішно вийшли з системи.")
     return HttpResponse("Вас нема у системі.")
-

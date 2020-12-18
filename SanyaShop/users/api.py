@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,18 +8,12 @@ from rest_framework.views import APIView
 from django.conf import settings
 import redis
 
-_redis_instance = redis.StrictRedis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=0
-)
-
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
 
 class UserView(APIView):
     def get(
@@ -31,13 +26,14 @@ class UserView(APIView):
         port=settings.REDIS_PORT,
         db=0
     )
+        if _redis.get("login") is None:
+            #return redirect("https://memepedia.ru/wp-content/uploads/2019/02/obladaet-mem-4.jpg")
+            return Response("Ви не авторизовані. Будь ласка, зайдіть до системи.", status=403)
         user = []
-        if _identificator is not None:
-            user = get_object_or_404(User, id=_identificator)
-        if str(_redis.get("login")) is None:
-            return Response("You are not logged in. Log in to perform such actions.", status=401)
+     
         lgn = _redis.get("login").decode('ascii')
         user = User.objects.filter(login = lgn)[0]
+
         serializer = UserSerializer(user, many=False)
         dt = serializer.data
         dt.pop('password')
@@ -68,9 +64,6 @@ class UserView(APIView):
             return Response("You are not logged in. Log in to perform such actions.", status=401)
         lgn = _redis.get("login").decode('ascii')
         user = User.objects.filter(login = lgn)[0]
-        print("="*50)
-        print(user)
-        print("="*50)
 
         body = request.data
         if 'login' in body:
@@ -104,7 +97,6 @@ class UserView(APIView):
         user = get_object_or_404(User, login=lgn)
 
         user.delete()
-        _redis.delete("cart")
         _redis.delete("login")
         
         return Response(f"Ви видалили свій аккаунт.")

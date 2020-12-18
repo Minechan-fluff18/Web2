@@ -29,10 +29,10 @@ class ShoppingItemView(APIView):
             data = ShoppingItem.objects.all()
             serializer = ShoppingItemSerializer(data, many = True)
             return Response(serializer.data)
-        elif 'category/' not in _identificator:
+        else:
             try:
-                ide = int(_identificator)
-                data = get_object_or_404(ShoppingItemView, id=ide)
+                ide = str( int(_identificator))
+                data = get_object_or_404(ShoppingItem, id=ide)
                 serializer = ShoppingItemSerializer(data)
                 return Response(serializer.data)
             except ValueError as e:
@@ -41,7 +41,7 @@ class ShoppingItemView(APIView):
                 return Response("Such item does not exist.")
         
         
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         _redis = redis.StrictRedis(
         host=settings.REDIS_HOST,
         port=settings.REDIS_PORT,
@@ -60,7 +60,9 @@ class ShoppingItemView(APIView):
 
     def patch(
         self,
-        request
+        request,
+        *args,
+        **kwargs
     ):
         _redis = redis.StrictRedis(
             host=settings.REDIS_HOST,
@@ -87,7 +89,7 @@ class ShoppingItemView(APIView):
         return Response("You are not authorized to change this message.", status=401)
 
 
-    def delete(self,request,):
+    def delete(self,request, *args, **kwargs):
         _redis = redis.StrictRedis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
@@ -104,7 +106,3 @@ class ShoppingItemView(APIView):
             return Response("Item deleted.")
         return Response("You are not authorized to change this message.", status=401)
         
-
-
-
-

@@ -28,6 +28,7 @@ services:
     depends_on:
       - db
       - redis
+  
   redis:
     image: "redis"
     ports:

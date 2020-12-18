@@ -23,11 +23,18 @@ def like(request):
     if likes == None:
         likes = []
     if item.id in likes:
-        return HttpResponse("Ви вже лайкнули цей товар.")
+        idx = likes.index(item.id)
+        new_likes = likes[:idx]
+        new_likes.extend(likes[idx+1:])
+        user.likes = new_likes
+        user.save()
+        item.likes = item.likes - 1
+        item.save()
+        return HttpResponse("Ви забрали лайк з товару.")
     likes.append(item.id)
     user.likes = likes
     user.save()
     item.likes = item.likes + 1
     item.save()
-    print(item.likes)
-    return HttpResponse(item.likes)
+    (item.likes)
+    return HttpResponse(f"Ви успішно лайкнули товар '{item.name}'! Тепер на ньому {item.likes} лайк(ів).")

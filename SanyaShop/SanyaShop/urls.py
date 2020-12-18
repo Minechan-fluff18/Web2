@@ -1,15 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
-from shop_items.api import ShoppingItemView
-from shop_items.views import like
-from users.api import UserView
 from users.views import login, logout
+from shop_items.views import like
+from shop_items.api import ShoppingItemView
 from shop_items.models import ShoppingItem
-
-router = routers.DefaultRouter()
+from users.api import UserView
 
 from django.contrib import admin
 from django.urls import path
+router = routers.DefaultRouter()
+
 
 urlpatterns = [
     path("", include(router.urls)),
